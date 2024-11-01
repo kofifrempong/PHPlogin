@@ -1,0 +1,23 @@
+FROM php:8.3.2-apache
+WORKDIR /var/www/html
+RUN docker-php-ext-install pdo pdo_mysql
+RUN docker-php-ext-install mysqli
+
+
+
+
+
+# Update package manager, install git, unzip and composer
+RUN apt-get update && apt-get install -y git unzip \
+    && curl -sS https://getcomposer.org/installer \
+    | php -- --install-dir=/usr/local/bin --filename=composer
+
+# we'll mount the volume in docker-compose so don't need to copy
+# however, if you are using this for production then may want it
+# leaving it in doesn't hurt
+COPY src/ /var/www/html/
+
+# Install the symfony/yaml package via Composer
+RUN composer require symfony/yaml
+
+RUN composer require vlucas/phpdotenv

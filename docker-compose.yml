@@ -1,0 +1,42 @@
+version: '3.8'
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile-web
+    container_name: web
+    ports:
+      - "8800:80"
+    volumes:
+      - ./src:/var/www/html
+      - ./src/vendor:/var/www/html/vendor
+      - ./.env:/var/www/html/.env  # Mount the .env file
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE}
+    platform: linux/amd64
+
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile-db
+    container_name: db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    platform: linux/amd64
+
+volumes:
+  mysql_data:
+
+    # Define volume for persisting MySQL data
